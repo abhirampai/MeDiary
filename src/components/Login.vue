@@ -12,6 +12,9 @@
                         <label for="password">Password</label>
                         <input type="password" v-model="password" class="form-control" name="password" placeholder="Enter Password">
                     </div>
+                    <div>
+                      <p class="text-danger" >{{p}}</p>
+                    </div>
                     <button class="btn btn-lg btn-primary btn-block">Sign in</button>
                 </form>
             </div>
@@ -29,7 +32,8 @@ export default {
   data () {
     return {
       email: '',
-      password: ''
+      password: '',
+      p: ''
     }
   },
 
@@ -39,14 +43,19 @@ export default {
         email: this.email,
         password: this.password
       }).then(res => {
-        localStorage.setItem('usertoken', res.data.token)
-        this.email = ''
-        this.password = ''
-        router.push({ name: 'Profile' })
+        if (typeof res.data.token !== 'undefined') {
+          localStorage.setItem('usertoken', res.data.token)
+          this.email = ''
+          this.password = ''
+          this.p = ''
+          router.push({ name: 'Profile' })
+          this.emitMethod()
+        } else {
+          this.p = 'invalid email or password'
+        }
       }).catch(err => {
         console.log(err)
       })
-      this.emitMethod()
     },
     emitMethod () {
       EventBus.$emit('logged-in', 'loggedin')
